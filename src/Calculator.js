@@ -1,15 +1,65 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import ClearButton from './components/ClearButton';
+import Button from './elements/Button';
 import Digits from './components/Digits';
 import Operators from './components/Operators';
 import Screen from './components/Screen';
 import { isOverMaxLength } from './validator';
+import { add, sub, mul, div } from './utils/operations';
+import { ERROR_MESSAGE } from './constants';
 
 export default function Calculator() {
   const [screenNumber, setScreenNumber] = useState(0);
   const [recordNumber, setRecordNumber] = useState(0);
   const [isNumberStep, setIsNumberStep] = useState(true);
+  const [operator, setOperator] = useState('');
 
+  const onClickButton = () => {
+    setScreenNumber(0);
+    setRecordNumber(0);
+  };
+
+  const initializeCalculator = () => {
+    setIsNumberStep(false);
+    setRecordNumber(0);
+    setOperator('');
+  };
+
+  const onClickOperator = (clickedOperator) => {
+    if (clickedOperator !== '=') {
+      if (isNumberStep && recordNumber !== 0) {
+        alert(ERROR_MESSAGE.OVER_INPUT_NUMBER_COUNT);
+        return;
+      }
+      setIsNumberStep(false);
+      setRecordNumber(screenNumber);
+      setOperator(clickedOperator);
+      return;
+    }
+
+    // '=' 이 눌린 경우
+    initializeCalculator();
+
+    switch (operator) {
+      case '+':
+        setScreenNumber(add(recordNumber, screenNumber));
+        break;
+      case '-':
+        setScreenNumber(sub(recordNumber, screenNumber));
+        break;
+      case 'X':
+        setScreenNumber(mul(recordNumber, screenNumber));
+        break;
+      case '/':
+        if (screenNumber === 0) {
+          setScreenNumber(ERROR_MESSAGE.INFINITE_NUMBER);
+          return;
+        }
+        setScreenNumber(div(recordNumber, screenNumber));
+        break;
+      default:
+        break;
+    }
+  };
   const handleBeforeUnload = useCallback((e) => {
     e.preventDefault();
     e.returnValue = '';
@@ -55,17 +105,11 @@ export default function Calculator() {
       <Screen screenNumber={screenNumber} />
       <Digits onClickDigit={onClickDigit} />
       <Operators
-        setScreenNumber={setScreenNumber}
-        screenNumber={screenNumber}
-        setStep={setIsNumberStep}
         isNumberStep={isNumberStep}
         recordNumber={recordNumber}
-        setRecordNumber={setRecordNumber}
+        onClickOperator={onClickOperator}
       />
-      <ClearButton
-        setScreenNumber={setScreenNumber}
-        setRecordNumber={setRecordNumber}
-      />
+      <Button onClickButton={onClickButton} buttonContent="AC" />
     </div>
   );
 }
