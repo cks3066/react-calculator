@@ -7,7 +7,7 @@
 
 ## 데모페이지
 
-[자동차 경주 게임 데모페이지🏎](https://cks3066.github.io/javascript-racingcar/)
+[리액트 계산기 데모페이지🏎](https://cks3066.github.io/react-calculator/)
 <br>
 
 
